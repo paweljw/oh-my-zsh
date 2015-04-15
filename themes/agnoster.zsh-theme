@@ -61,8 +61,10 @@ prompt_end() {
 # Context: user@hostname (who am I and where am I)
 prompt_context() {
   if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
-    prompt_segment black default "%(!.%{%F{yellow}%}.)$USER@%m"
+    prompt_segment '' default "%(!.%{%F{yellow}%}.)$USER@%m"
   fi
+
+  CURRENT_BG=''
 }
 
 # Git: branch/detached head, dirty status
@@ -150,6 +152,19 @@ prompt_virtualenv() {
   fi
 }
 
+prompt_rvm_ruby()
+{
+	local rvm_ruby=''
+	if which rvm-prompt &> /dev/null; then
+	  rvm_ruby=`rvm-prompt i v g`
+	else
+	  if which rbenv &> /dev/null; then
+	    rvm_ruby=`rbenv version | sed -e "s/ (set.*$//")`
+	  fi
+	fi
+	prompt_segment red white $rvm_ruby
+}
+
 # Status:
 # - was there an error
 # - am I root
@@ -173,6 +188,7 @@ build_prompt() {
   prompt_dir
   prompt_git
   prompt_hg
+  prompt_rvm_ruby
   prompt_end
 }
 
