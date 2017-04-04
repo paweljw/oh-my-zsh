@@ -81,7 +81,7 @@ fi
 
 # RMV
 if [ ! -n "${BULLETTRAIN_RVM_SHOW+1}" ]; then
-  BULLETTRAIN_RVM_SHOW=true
+  BULLETTRAIN_RVM_SHOW=false
 fi
 if [ ! -n "${BULLETTRAIN_RVM_BG+1}" ]; then
   BULLETTRAIN_RVM_BG=magenta
@@ -90,7 +90,20 @@ if [ ! -n "${BULLETTRAIN_RVM_FG+1}" ]; then
   BULLETTRAIN_RVM_FG=white
 fi
 if [ ! -n "${BULLETTRAIN_RVM_PREFIX+1}" ]; then
-  BULLETTRAIN_RVM_PREFIX=⌬
+  BULLETTRAIN_RVM_PREFIX='⛩ '
+fi
+
+if [ ! -n "${BULLETTRAIN_RBENV_SHOW+1}" ]; then
+  BULLETTRAIN_RBENV_SHOW=true
+fi
+if [ ! -n "${BULLETTRAIN_RBENV_BG+1}" ]; then
+  BULLETTRAIN_RBENV_BG=magenta
+fi
+if [ ! -n "${BULLETTRAIN_RBENV_FG+1}" ]; then
+  BULLETTRAIN_RBENV_FG=white
+fi
+if [ ! -n "${BULLETTRAIN_RBENV_PREFIX+1}" ]; then
+  BULLETTRAIN_RBENV_PREFIX='⛩ '
 fi
 
 # DIR
@@ -147,32 +160,32 @@ else
   ZSH_THEME_GIT_PROMPT_SUFFIX=$BULLETTRAIN_GIT_SUFFIX
 fi
 if [ ! -n "${BULLETTRAIN_GIT_DIRTY+1}" ]; then
-  ZSH_THEME_GIT_PROMPT_DIRTY=" ✘"
+  ZSH_THEME_GIT_PROMPT_DIRTY=" ❌"
 else
   ZSH_THEME_GIT_PROMPT_DIRTY=$BULLETTRAIN_GIT_DIRTY
 fi
 if [ ! -n "${BULLETTRAIN_GIT_CLEAN+1}" ]; then
-  ZSH_THEME_GIT_PROMPT_CLEAN=" ✔"
+  ZSH_THEME_GIT_PROMPT_CLEAN=" ✅ "
 else
   ZSH_THEME_GIT_PROMPT_CLEAN=$BULLETTRAIN_GIT_CLEAN
 fi
 if [ ! -n "${BULLETTRAIN_GIT_ADDED+1}" ]; then
-  ZSH_THEME_GIT_PROMPT_ADDED=" %F{green}✚%F{black}"
+  ZSH_THEME_GIT_PROMPT_ADDED=" 🍏 "
 else
   ZSH_THEME_GIT_PROMPT_ADDED=$BULLETTRAIN_GIT_ADDED
 fi
 if [ ! -n "${BULLETTRAIN_GIT_MODIFIED+1}" ]; then
-  ZSH_THEME_GIT_PROMPT_MODIFIED=" %F{blue}✹%F{black}"
+  ZSH_THEME_GIT_PROMPT_MODIFIED=" 🍅 "
 else
   ZSH_THEME_GIT_PROMPT_MODIFIED=$BULLETTRAIN_GIT_MODIFIED
 fi
 if [ ! -n "${BULLETTRAIN_GIT_DELETED+1}" ]; then
-  ZSH_THEME_GIT_PROMPT_DELETED=" %F{red}✖%F{black}"
+  ZSH_THEME_GIT_PROMPT_DELETED=" 🍎 "
 else
   ZSH_THEME_GIT_PROMPT_DELETED=$BULLETTRAIN_GIT_DELETED
 fi
 if [ ! -n "${BULLETTRAIN_GIT_UNTRACKED+1}" ]; then
-  ZSH_THEME_GIT_PROMPT_UNTRACKED=" %F{yellow}✭%F{black}"
+  ZSH_THEME_GIT_PROMPT_UNTRACKED=" 🍌 "
 else
   ZSH_THEME_GIT_PROMPT_UNTRACKED=$BULLETTRAIN_GIT_UNTRACKED
 fi
@@ -182,22 +195,22 @@ else
   ZSH_THEME_GIT_PROMPT_RENAMED=$BULLETTRAIN_GIT_RENAMED
 fi
 if [ ! -n "${BULLETTRAIN_GIT_UNMERGED+1}" ]; then
-  ZSH_THEME_GIT_PROMPT_UNMERGED=" ═"
+  ZSH_THEME_GIT_PROMPT_UNMERGED=" 🍻 "
 else
   ZSH_THEME_GIT_PROMPT_UNMERGED=$BULLETTRAIN_GIT_UNMERGED
 fi
 if [ ! -n "${BULLETTRAIN_GIT_AHEAD+1}" ]; then
-  ZSH_THEME_GIT_PROMPT_AHEAD=" ⬆"
+  ZSH_THEME_GIT_PROMPT_AHEAD=" ⬆️ "
 else
   ZSH_THEME_GIT_PROMPT_AHEAD=$BULLETTRAIN_GIT_AHEAD
 fi
 if [ ! -n "${BULLETTRAIN_GIT_BEHIND+1}" ]; then
-  ZSH_THEME_GIT_PROMPT_BEHIND=" ⬇"
+  ZSH_THEME_GIT_PROMPT_BEHIND=" ⬇ ️"
 else
   ZSH_THEME_GIT_PROMPT_BEHIND=$BULLETTRAIN_GIT_BEHIND
 fi
 if [ ! -n "${BULLETTRAIN_GIT_DIVERGED+1}" ]; then
-  ZSH_THEME_GIT_PROMPT_DIVERGED=" ⬍"
+  ZSH_THEME_GIT_PROMPT_DIVERGED=" ↕ ️"
 else
   ZSH_THEME_GIT_PROMPT_DIVERGED=$BULLETTRAIN_GIT_PROMPT_DIVERGED
 fi
@@ -246,7 +259,7 @@ prompt_end() {
 # Context: user@hostname (who am I and where am I)
 context() {
   local user="$(whoami)"
-  [[ "$user" != "$BULLETTRAIN_CONTEXT_DEFAULT_USER" || -n "$BULLETTRAIN_IS_SSH_CLIENT" ]] && echo -n "${user}🍊\ %m"
+  [[ "$user" != "$BULLETTRAIN_CONTEXT_DEFAULT_USER" || -n "$BULLETTRAIN_IS_SSH_CLIENT" ]] && echo -n "${user}🍊 %m"
 }
 prompt_context() {
   [[ $BULLETTRAIN_CONTEXT_SHOW == false ]] && return
@@ -337,6 +350,14 @@ prompt_rvm() {
   fi
 }
 
+prompt_rbenv() {
+  if [[ $BULLETTRAIN_RBENV_SHOW == false ]] then
+    return
+  fi
+
+  prompt_segment $BULLETTRAIN_RVM_BG $BULLETTRAIN_RVM_FG $BULLETTRAIN_RVM_PREFIX" $(rbenv version-name)@$(rbenv gemset active 2&>/dev/null | sed -e ":a" -e '$ s/\n/+/gp;N;b a' | head -n1)"
+}
+
 # Virtualenv: current working virtualenv
 prompt_virtualenv() {
   if [[ $BULLETTRAIN_VIRTUALENV_SHOW == false ]] then
@@ -424,7 +445,8 @@ build_prompt() {
 #  prompt_nvm
   prompt_context
   prompt_dir
-  prompt_rvm
+#  prompt_rvm
+#  prompt_rbenv
   prompt_git
   # prompt_hg
   prompt_end

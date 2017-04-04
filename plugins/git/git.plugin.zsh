@@ -150,7 +150,7 @@ alias gke='\gitk --all $(git log -g --pretty=format:%h)'
 compdef _git gke='gitk'
 
 alias gl='git pull'
-alias glg='git log --stat --color'
+alias glg='git log --all --graph --decorate --oneline --color'
 alias glgp='git log --stat --color -p'
 alias glgg='git log --graph --color'
 alias glgga='git log --graph --decorate --all'
